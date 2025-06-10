@@ -8,6 +8,8 @@ require (
 )
 
 require (
+	github.com/OvyFlash/telegram-bot-api v0.0.0-20250511194450-d315c30d9c40 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 )

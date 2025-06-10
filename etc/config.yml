@@ -1,0 +1,4 @@
+log:
+  level_code: "debug"
+  output_format: "text"
+  path: "var/log/app.log"

@@ -1,0 +1,6 @@
+system:
+  default_lang_tag: "ru"
+log:
+  level_code: "debug"
+  output_format: "json"
+  path: "var/log/app.log.json"

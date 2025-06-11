@@ -35,7 +35,7 @@ func load(fname string) (res *AppConfig, err error) {
 		return nil, err
 	}
 
-	if err = yaml.Unmarshal(data, res); err != nil {
+	if err := yaml.Unmarshal(data, res); err != nil {
 		return nil, err
 	}
 

@@ -68,10 +68,12 @@ func run() error {
 	})
 }
 
-func getLogger(isProduction bool) (logger *zap.Logger, cleanup func()) {
-	cfg := zap.NewProductionConfig()
-	if !isProduction {
+func getLogger(isDevelopment bool) (logger *zap.Logger, cleanup func()) {
+	var cfg zap.Config
+	if isDevelopment {
 		cfg = zap.NewDevelopmentConfig()
+	} else {
+		cfg = zap.NewProductionConfig()
 	}
 	cfg.Encoding = "json"
 	cfg.OutputPaths = []string{"var/log/app.log"}

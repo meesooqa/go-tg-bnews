@@ -29,12 +29,16 @@ func InitServiceProcessor() Processor {
 }
 
 // LoadChannelsProcessor loads channels by their names and caches them
-func LoadChannelsProcessor(names ...string) Processor {
+func LoadChannelsProcessor(channelFrom, channelTo string) Processor {
 	return func(st *PipelineState) error {
 		st.cacheMu.Lock()
 		defer st.cacheMu.Unlock()
 
+		names := [2]string{channelFrom, channelTo}
 		for _, name := range names {
+			if name == "" {
+				return fmt.Errorf("channel name cannot be empty")
+			}
 			if _, ok := st.chanCache[name]; !ok {
 				ch, err := st.Service.GetChannel(st.Ctx, name)
 				if err != nil {

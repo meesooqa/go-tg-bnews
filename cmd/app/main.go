@@ -55,8 +55,7 @@ func run() error {
 		pipeline := proc.Chain(
 			proc.AuthProcessor(flow),
 			proc.InitServiceProcessor(),
-			// TODO load channels from config
-			proc.LoadChannelsProcessor("test_bbbolt_001", "test_bbbolt_002"),
+			proc.LoadChannelsProcessor(os.Getenv("CHANNEL_FROM"), os.Getenv("CHANNEL_TO")),
 			proc.FetchMessagesProcessor(),
 			proc.FilterProcessor(
 				proc.SkipNoText,

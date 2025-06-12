@@ -19,10 +19,11 @@ type PipelineState struct {
 	Conf   *config.AppConfig
 	Logger *slog.Logger
 
-	Service     *mytg.Service
-	ChannelFrom *tg.Channel
-	ChannelTo   *tg.Channel
-	Messages    []*tg.Message
+	Service          *mytg.Service
+	ChannelFrom      *tg.Channel
+	ChannelTo        *tg.Channel
+	Messages         []*tg.Message
+	messagesOffsetID int
 
 	chanCache map[string]*tg.Channel
 	cacheMu   sync.Mutex
@@ -50,5 +51,15 @@ func NewPipelineState(ctx context.Context, conf *config.AppConfig, logger *slog.
 		Conf:   conf,
 		Logger: logger,
 		Client: client,
+	}
+}
+
+// SetMessages sets the messages in the PipelineState and updates the offset ID
+func (ps *PipelineState) SetMessages(msgs []*tg.Message) {
+	ps.Messages = msgs
+	if len(msgs) > 0 {
+		ps.messagesOffsetID = msgs[len(msgs)-1].ID
+	} else {
+		ps.messagesOffsetID = 0
 	}
 }

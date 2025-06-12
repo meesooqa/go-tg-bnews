@@ -52,11 +52,11 @@ func LoadChannelsProcessor(names ...string) Processor {
 // FetchMessagesProcessor fetches messages from the source channel
 func FetchMessagesProcessor() Processor {
 	return func(st *PipelineState) error {
-		msgs, err := st.Service.GetMessages(st.Ctx, st.ChannelFrom)
+		msgs, err := st.Service.GetMessages(st.Ctx, st.ChannelFrom, st.messagesOffsetID)
 		if err != nil {
 			return fmt.Errorf("fetch messages: %w", err)
 		}
-		st.Messages = msgs
+		st.SetMessages(msgs)
 		if len(msgs) == 0 {
 			return fmt.Errorf("no messages in %s", st.ChannelFrom.Username)
 		}

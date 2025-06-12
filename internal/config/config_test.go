@@ -13,6 +13,9 @@ func TestLoad(t *testing.T) {
 
 	require.NoError(t, err)
 
+	assert.IsType(t, &Telegram{}, c.Telegram)
+	assert.Equal(t, 10, c.Telegram.HistoryLimit)
+
 	assert.IsType(t, &Log{}, c.Log)
 	assert.Equal(t, "debug", c.Log.LevelCode)
 	assert.Equal(t, slog.LevelDebug, c.Log.Level)

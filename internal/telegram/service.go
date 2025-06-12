@@ -8,17 +8,21 @@ import (
 	"math/big"
 
 	"github.com/gotd/td/tg"
+
+	"github.com/meesooqa/go-tg-bnews/internal/config"
 )
 
 // Service provides methods to interact with Telegram API
 type Service struct {
-	api *tg.Client
+	conf *config.Telegram
+	api  *tg.Client
 }
 
 // NewService creates a new Telegram service with the provided API client
-func NewService(api *tg.Client) *Service {
+func NewService(conf *config.Telegram, api *tg.Client) *Service {
 	return &Service{
-		api: api,
+		conf: conf,
+		api:  api,
 	}
 }
 
@@ -39,14 +43,12 @@ func (s Service) GetChannel(ctx context.Context, name string) (*tg.Channel, erro
 
 // GetMessages retrieves the last messages from a Telegram channel
 func (s Service) GetMessages(ctx context.Context, from *tg.Channel) ([]*tg.Message, error) {
-	limit := 5
-
 	messages, err := s.api.MessagesGetHistory(ctx, &tg.MessagesGetHistoryRequest{
 		Peer: &tg.InputPeerChannel{
 			ChannelID:  from.ID,
 			AccessHash: from.AccessHash,
 		},
-		Limit: limit,
+		Limit: s.conf.HistoryLimit,
 		//OffsetID: lastMessageID,
 	})
 	if err != nil {

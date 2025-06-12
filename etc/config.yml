@@ -1,3 +1,5 @@
+telegram:
+  history_limit: 10
 log:
   level_code: "debug"
   output_format: "text"

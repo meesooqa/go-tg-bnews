@@ -2,18 +2,23 @@ package proc
 
 import (
 	"context"
+	"log/slog"
 	"sync"
 
 	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/tg"
 
+	"github.com/meesooqa/go-tg-bnews/internal/config"
 	mytg "github.com/meesooqa/go-tg-bnews/internal/telegram"
 )
 
 // PipelineState holds the state of the processing pipeline
 type PipelineState struct {
-	Ctx         context.Context
-	Client      *telegram.Client
+	Ctx    context.Context
+	Client *telegram.Client
+	Conf   *config.AppConfig
+	Logger *slog.Logger
+
 	Service     *mytg.Service
 	ChannelFrom *tg.Channel
 	ChannelTo   *tg.Channel
@@ -35,5 +40,15 @@ func Chain(stages ...Processor) Processor {
 			}
 		}
 		return nil
+	}
+}
+
+// NewPipelineState creates a new PipelineState with the provided context and configuration
+func NewPipelineState(ctx context.Context, conf *config.AppConfig, logger *slog.Logger, client *telegram.Client) *PipelineState {
+	return &PipelineState{
+		Ctx:    ctx,
+		Conf:   conf,
+		Logger: logger,
+		Client: client,
 	}
 }

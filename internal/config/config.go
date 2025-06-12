@@ -16,7 +16,8 @@ var logLevelMap = map[string]slog.Level{
 
 // AppConfig from config yml
 type AppConfig struct {
-	Log *Log `yaml:"log"`
+	Log      *Log      `yaml:"log"`
+	Telegram *Telegram `yaml:"telegram"`
 }
 
 // Log - log parameters
@@ -25,6 +26,11 @@ type Log struct {
 	Level        slog.Level
 	OutputFormat string `yaml:"output_format"`
 	Path         string `yaml:"path"`
+}
+
+// Telegram is used to configure the Telegram service
+type Telegram struct {
+	HistoryLimit int `yaml:"history_limit"`
 }
 
 // load config from file

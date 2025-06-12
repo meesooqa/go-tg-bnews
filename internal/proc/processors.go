@@ -22,8 +22,7 @@ func AuthProcessor(flow auth.Flow) Processor {
 // InitServiceProcessor initializes the service with the Telegram API client
 func InitServiceProcessor() Processor {
 	return func(st *PipelineState) error {
-		api := st.Client.API()
-		st.Service = mytg.NewService(api)
+		st.Service = mytg.NewService(st.Conf.Telegram, st.Client.API())
 		st.chanCache = make(map[string]*tg.Channel)
 		return nil
 	}

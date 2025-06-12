@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/telegram/auth"
@@ -38,11 +40,12 @@ func run() error {
 
 	ctx := context.Background()
 
-	// TODO test Telegram environment
-	client, err := telegram.ClientFromEnvironment(telegram.Options{
-		DC:     2,
-		DCList: dcs.Test(),
-	})
+	opts := telegram.Options{}
+	if isTestMode() {
+		opts.DC = 2
+		opts.DCList = dcs.Test()
+	}
+	client, err := telegram.ClientFromEnvironment(opts)
 	if err != nil {
 		return fmt.Errorf("error creating Telegram client: %w", err)
 	}
@@ -63,4 +66,17 @@ func run() error {
 		)
 		return pipeline(state)
 	})
+}
+
+func isTestMode() bool {
+	testMode := os.Getenv("IS_TEST_MODE")
+	if testMode == "" {
+		testMode = "false"
+	}
+	result, err := strconv.ParseBool(testMode)
+	if err != nil {
+		//return true, fmt.Errorf("invalid boolean value %q: %v", testMode, err)
+		return true
+	}
+	return result
 }

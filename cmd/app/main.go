@@ -56,7 +56,7 @@ func run() error {
 			proc.FetchMessagesProcessor(),
 			proc.FilterProcessor(
 				proc.SkipNoText,
-				// TODO proc.KeepLightning,
+				proc.KeepLightning,
 			),
 			proc.ForwardProcessor(),
 		)

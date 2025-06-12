@@ -2,7 +2,6 @@ package proc
 
 import (
 	"fmt"
-	"log/slog"
 
 	"github.com/gotd/td/telegram/auth"
 	"github.com/gotd/td/tg"
@@ -21,10 +20,10 @@ func AuthProcessor(flow auth.Flow) Processor {
 }
 
 // InitServiceProcessor initializes the service with the Telegram API client
-func InitServiceProcessor(logger *slog.Logger) Processor {
+func InitServiceProcessor() Processor {
 	return func(st *PipelineState) error {
 		api := st.Client.API()
-		st.Service = mytg.NewService(api, logger)
+		st.Service = mytg.NewService(api)
 		st.chanCache = make(map[string]*tg.Channel)
 		return nil
 	}

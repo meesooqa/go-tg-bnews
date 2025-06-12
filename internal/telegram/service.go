@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"log/slog"
 	"math"
 	"math/big"
 
@@ -13,15 +12,13 @@ import (
 
 // Service provides methods to interact with Telegram API
 type Service struct {
-	logger *slog.Logger
-	api    *tg.Client
+	api *tg.Client
 }
 
 // NewService creates a new Telegram service with the provided API client
-func NewService(api *tg.Client, logger *slog.Logger) *Service {
+func NewService(api *tg.Client) *Service {
 	return &Service{
-		logger: logger,
-		api:    api,
+		api: api,
 	}
 }
 
@@ -41,8 +38,8 @@ func (s Service) GetChannel(ctx context.Context, name string) (*tg.Channel, erro
 }
 
 // GetMessages retrieves the last messages from a Telegram channel
-func (s Service) GetMessages(ctx context.Context, from *tg.Channel) ([]tg.MessageClass, error) {
-	limit := 2
+func (s Service) GetMessages(ctx context.Context, from *tg.Channel) ([]*tg.Message, error) {
+	limit := 5
 
 	messages, err := s.api.MessagesGetHistory(ctx, &tg.MessagesGetHistoryRequest{
 		Peer: &tg.InputPeerChannel{
@@ -56,21 +53,27 @@ func (s Service) GetMessages(ctx context.Context, from *tg.Channel) ([]tg.Messag
 		return nil, fmt.Errorf("error getting history: %w", err)
 	}
 	// TODO save offsetID or offsetDate for next request
-	return messages.(*tg.MessagesChannelMessages).Messages, nil
+
+	ms := messages.(*tg.MessagesChannelMessages).Messages
+	result := make([]*tg.Message, 0, len(ms))
+	for _, m := range ms {
+		msg, ok := m.(*tg.Message)
+		if !ok {
+			continue
+		}
+		result = append(result, msg)
+	}
+	return result, nil
 }
 
 // ForwardMessages forwards messages from one channel to another
-func (s Service) ForwardMessages(ctx context.Context, messages []tg.MessageClass, from, to *tg.Channel) error {
+func (s Service) ForwardMessages(ctx context.Context, messages []*tg.Message, from, to *tg.Channel) error {
 	if len(messages) == 0 {
 		return nil
 	}
 	mID := make([]int, len(messages))
 	for _, msg := range messages {
-		m, ok := msg.(*tg.Message)
-		if !ok {
-			return nil
-		}
-		mID = append(mID, m.ID)
+		mID = append(mID, msg.ID)
 	}
 
 	_, err := s.api.MessagesForwardMessages(ctx, &tg.MessagesForwardMessagesRequest{

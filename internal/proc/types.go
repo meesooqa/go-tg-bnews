@@ -17,7 +17,7 @@ type PipelineState struct {
 	Service     *mytg.Service
 	ChannelFrom *tg.Channel
 	ChannelTo   *tg.Channel
-	Messages    []tg.MessageClass
+	Messages    []*tg.Message
 
 	chanCache map[string]*tg.Channel
 	cacheMu   sync.Mutex

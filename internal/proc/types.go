@@ -2,7 +2,6 @@ package proc
 
 import (
 	"context"
-	"log/slog"
 	"sync"
 
 	"github.com/gotd/td/telegram"
@@ -17,7 +16,6 @@ type PipelineState struct {
 	Ctx    context.Context
 	Client *telegram.Client
 	Conf   *config.AppConfig
-	Logger *slog.Logger
 
 	Service          *mytg.Service
 	ChannelFrom      *tg.Channel
@@ -45,11 +43,10 @@ func Chain(stages ...Processor) Processor {
 }
 
 // NewPipelineState creates a new PipelineState with the provided context and configuration
-func NewPipelineState(ctx context.Context, conf *config.AppConfig, logger *slog.Logger, client *telegram.Client) *PipelineState {
+func NewPipelineState(ctx context.Context, conf *config.AppConfig, client *telegram.Client) *PipelineState {
 	return &PipelineState{
 		Ctx:    ctx,
 		Conf:   conf,
-		Logger: logger,
 		Client: client,
 	}
 }

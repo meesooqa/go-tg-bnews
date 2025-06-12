@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,12 +14,6 @@ func TestLoad(t *testing.T) {
 
 	assert.IsType(t, &Telegram{}, c.Telegram)
 	assert.Equal(t, 10, c.Telegram.HistoryLimit)
-
-	assert.IsType(t, &Log{}, c.Log)
-	assert.Equal(t, "debug", c.Log.LevelCode)
-	assert.Equal(t, slog.LevelDebug, c.Log.Level)
-	assert.Equal(t, "json", c.Log.OutputFormat)
-	assert.Equal(t, "var/log/app.log.json", c.Log.Path)
 }
 
 func TestLoadConfigNotFoundFile(t *testing.T) {

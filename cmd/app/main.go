@@ -11,8 +11,8 @@ import (
 	"github.com/gotd/td/telegram/auth"
 	"github.com/gotd/td/telegram/dcs"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 
-	"github.com/meesooqa/go-tg-bnews/internal/applog"
 	"github.com/meesooqa/go-tg-bnews/internal/config"
 	"github.com/meesooqa/go-tg-bnews/internal/proc"
 	mytg "github.com/meesooqa/go-tg-bnews/internal/telegram"
@@ -34,13 +34,14 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("error getting app config: %w", err)
 	}
-	lp := applog.NewFileLoggerProvider(conf.Log)
-	logger, cleanup := lp.GetLogger()
-	defer cleanup()
 
 	ctx := context.Background()
 
-	opts := telegram.Options{}
+	logger, cleanup := getLogger(isTestMode())
+	defer cleanup()
+	opts := telegram.Options{
+		Logger: logger,
+	}
 	if isTestMode() {
 		opts.DC = 2
 		opts.DCList = dcs.Test()
@@ -51,7 +52,7 @@ func run() error {
 	}
 	flow := auth.NewFlow(mytg.AuthFlow{}, auth.SendCodeOptions{})
 	return client.Run(ctx, func(ctx context.Context) error {
-		state := proc.NewPipelineState(ctx, conf, logger, client)
+		state := proc.NewPipelineState(ctx, conf, client)
 		pipeline := proc.Chain(
 			proc.AuthProcessor(flow),
 			proc.InitServiceProcessor(),
@@ -65,6 +66,24 @@ func run() error {
 		)
 		return pipeline(state)
 	})
+}
+
+func getLogger(isProduction bool) (logger *zap.Logger, cleanup func()) {
+	cfg := zap.NewProductionConfig()
+	if !isProduction {
+		cfg = zap.NewDevelopmentConfig()
+	}
+	cfg.Encoding = "json"
+	cfg.OutputPaths = []string{"var/log/app.log"}
+
+	logger, err := cfg.Build()
+	if err != nil {
+		log.Fatalf("failed to create logger: %v", err)
+	}
+	cleanup = func() {
+		logger.Sync() // nolint:errcheck
+	}
+	return logger, cleanup
 }
 
 func isTestMode() bool {

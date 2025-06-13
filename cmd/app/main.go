@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/gotd/td/telegram"
-	"github.com/gotd/td/telegram/auth"
 	"github.com/gotd/td/telegram/dcs"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -50,7 +49,7 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("error creating Telegram client: %w", err)
 	}
-	flow := auth.NewFlow(mytg.AuthFlow{}, auth.SendCodeOptions{})
+	flow := mytg.NewTelegramAuthFlow()
 	return client.Run(ctx, func(ctx context.Context) error {
 		state := proc.NewPipelineState(ctx, conf, client)
 		pipeline := proc.Chain(

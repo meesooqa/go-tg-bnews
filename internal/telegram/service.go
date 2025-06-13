@@ -43,7 +43,6 @@ func (s Service) GetChannel(ctx context.Context, name string) (*tg.Channel, erro
 
 // GetMessages retrieves the last messages from a Telegram channel
 func (s Service) GetMessages(ctx context.Context, from *tg.Channel, offsetID int) ([]*tg.Message, error) {
-	//endID := offsetID + s.conf.HistoryLimit - 1
 	messages, err := s.api.MessagesGetHistory(ctx, &tg.MessagesGetHistoryRequest{
 		Peer: &tg.InputPeerChannel{
 			ChannelID:  from.ID,
@@ -51,7 +50,6 @@ func (s Service) GetMessages(ctx context.Context, from *tg.Channel, offsetID int
 		},
 		Limit:    s.conf.HistoryLimit,
 		OffsetID: offsetID,
-		//AddOffset: offsetID - endID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error getting history: %w", err)

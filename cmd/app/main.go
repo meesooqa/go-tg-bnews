@@ -35,8 +35,8 @@ func run() error {
 		return fmt.Errorf("error getting app config: %w", err)
 	}
 
-	logger, cleanup := getLogger(isTestMode())
-	defer cleanup()
+	logger := getLogger(isTestMode())
+	defer logger.Sync() // nolint
 	opts := telegram.Options{
 		Logger: logger,
 	}
@@ -70,7 +70,7 @@ func run() error {
 	})
 }
 
-func getLogger(isDevelopment bool) (*zap.Logger, func()) {
+func getLogger(isDevelopment bool) *zap.Logger {
 	var cfg zap.Config
 	if isDevelopment {
 		cfg = zap.NewDevelopmentConfig()
@@ -84,10 +84,8 @@ func getLogger(isDevelopment bool) (*zap.Logger, func()) {
 	if err != nil {
 		log.Fatalf("failed to create logger: %v", err)
 	}
-	cleanup := func() {
-		logger.Sync() // nolint:errcheck
-	}
-	return logger, cleanup
+
+	return logger
 }
 
 func isTestMode() bool {
@@ -97,7 +95,6 @@ func isTestMode() bool {
 	}
 	result, err := strconv.ParseBool(testMode)
 	if err != nil {
-		//return true, fmt.Errorf("invalid boolean value %q: %v", testMode, err)
 		return true
 	}
 	return result

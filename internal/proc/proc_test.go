@@ -58,11 +58,11 @@ func TestChain(t *testing.T) {
 
 	t.Run("ExecutionOrder", func(t *testing.T) {
 		callOrder := []int{}
-		p1 := Processor(func(s *PipelineState) error {
+		p1 := Processor(func(_ *PipelineState) error {
 			callOrder = append(callOrder, 1)
 			return nil
 		})
-		p2 := Processor(func(s *PipelineState) error {
+		p2 := Processor(func(_ *PipelineState) error {
 			callOrder = append(callOrder, 2)
 			return nil
 		})
@@ -75,10 +75,10 @@ func TestChain(t *testing.T) {
 
 	t.Run("ErrorPropagation", func(t *testing.T) {
 		testError := errors.New("test error")
-		pErr := Processor(func(s *PipelineState) error {
+		pErr := Processor(func(_ *PipelineState) error {
 			return testError
 		})
-		pNeverCalled := Processor(func(s *PipelineState) error {
+		pNeverCalled := Processor(func(_ *PipelineState) error {
 			t.Fatal("This processor should not be called")
 			return nil
 		})

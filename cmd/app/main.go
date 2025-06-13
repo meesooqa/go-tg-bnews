@@ -19,6 +19,7 @@ import (
 )
 
 func main() {
+	// TODO periodically check for new messages
 	err := run()
 	if err != nil {
 		log.Fatal(err)

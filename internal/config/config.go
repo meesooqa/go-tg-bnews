@@ -16,10 +16,10 @@ type Telegram struct {
 	HistoryLimit int `yaml:"history_limit"`
 }
 
-// load config from file
-func load(fname string) (res *AppConfig, err error) {
+// Load config from file
+func Load(filename string) (res *AppConfig, err error) {
 	res = &AppConfig{}
-	data, err := os.ReadFile(fname) // #nosec G304
+	data, err := os.ReadFile(filename) // #nosec G304
 	if err != nil {
 		return nil, err
 	}

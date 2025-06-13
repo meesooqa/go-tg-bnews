@@ -8,7 +8,7 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	c, err := load("testdata/config.yml")
+	c, err := Load("testdata/config.yml")
 
 	require.NoError(t, err)
 
@@ -17,13 +17,13 @@ func TestLoad(t *testing.T) {
 }
 
 func TestLoadConfigNotFoundFile(t *testing.T) {
-	r, err := load("/tmp/43069010-7051-421d-87af-d70d1906635e.txt")
+	r, err := Load("/tmp/43069010-7051-421d-87af-d70d1906635e.txt")
 	assert.Nil(t, r)
 	assert.EqualError(t, err, "open /tmp/43069010-7051-421d-87af-d70d1906635e.txt: no such file or directory")
 }
 
 func TestLoadConfigInvalidYaml(t *testing.T) {
-	r, err := load("testdata/file.txt")
+	r, err := Load("testdata/file.txt")
 
 	assert.Nil(t, r)
 	assert.EqualError(t, err, "yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `Not Yaml` into config.AppConfig")

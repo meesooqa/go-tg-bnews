@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
 
 	"github.com/gotd/td/telegram"
@@ -28,13 +29,10 @@ func run() error {
 	if err := godotenv.Load(); err != nil {
 		return fmt.Errorf("error loading .env file: %w", err)
 	}
-	cp := config.NewDefaultConfigProvider()
-	conf, err := cp.GetAppConfig()
+	conf, err := config.Load("etc/config.yml")
 	if err != nil {
 		return fmt.Errorf("error getting app config: %w", err)
 	}
-
-	ctx := context.Background()
 
 	logger, cleanup := getLogger(isTestMode())
 	defer cleanup()
@@ -42,13 +40,17 @@ func run() error {
 		Logger: logger,
 	}
 	if isTestMode() {
-		opts.DC = 2
+		opts.DC = 2 // See https://my.telegram.org/apps configuration
 		opts.DCList = dcs.Test()
 	}
 	client, err := telegram.ClientFromEnvironment(opts)
 	if err != nil {
 		return fmt.Errorf("error creating Telegram client: %w", err)
 	}
+
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	defer cancel()
+
 	flow := mytg.NewTelegramAuthFlow()
 	return client.Run(ctx, func(ctx context.Context) error {
 		state := proc.NewPipelineState(ctx, conf, client)
@@ -67,7 +69,7 @@ func run() error {
 	})
 }
 
-func getLogger(isDevelopment bool) (logger *zap.Logger, cleanup func()) {
+func getLogger(isDevelopment bool) (*zap.Logger, func()) {
 	var cfg zap.Config
 	if isDevelopment {
 		cfg = zap.NewDevelopmentConfig()
@@ -81,7 +83,7 @@ func getLogger(isDevelopment bool) (logger *zap.Logger, cleanup func()) {
 	if err != nil {
 		log.Fatalf("failed to create logger: %v", err)
 	}
-	cleanup = func() {
+	cleanup := func() {
 		logger.Sync() // nolint:errcheck
 	}
 	return logger, cleanup
